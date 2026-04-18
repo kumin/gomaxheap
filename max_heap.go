@@ -26,8 +26,27 @@ func (h *Heap) Pop() *Node {
 		slog.Warn("heap is empty")
 		return nil
 	}
+	root := h.nodes[0]
 
-	return h.nodes[0]
+	h.nodes[0] = h.nodes[h.Size()-1]
+	h.nodes = h.nodes[:h.Size()-1]
+
+	parentIdx := 0
+	nextParentIdx := parentIdx
+	n := h.Size()
+	for parentIdx*2+1 < n {
+		if parentIdx*2+1 < n && h.nodes[parentIdx].Weight < h.nodes[parentIdx*2+1].Weight {
+			h.nodes[parentIdx], h.nodes[parentIdx*2+1] = h.nodes[parentIdx*2+1], h.nodes[parentIdx]
+			nextParentIdx = parentIdx*2 + 1
+		}
+		if parentIdx*2+2 < n && h.nodes[parentIdx].Weight < h.nodes[parentIdx*2+2].Weight {
+			h.nodes[parentIdx], h.nodes[parentIdx*2+2] = h.nodes[parentIdx*2+2], h.nodes[parentIdx]
+			nextParentIdx = parentIdx*2 + 2
+		}
+		parentIdx = nextParentIdx
+	}
+
+	return root
 }
 
 func (h *Heap) Insert(node *Node) {
